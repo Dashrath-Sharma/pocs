@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Geolocation POC</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    button { margin-right: 10px; margin-top: 10px; }
+
+    #log, #errorLog {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      min-height: 50px;
+      white-space: pre-wrap;
+    }
+
+    #log {
+      background: #eef7ff;
+      border-left: 5px solid #3399ff;
+      color: #004a80;
+    }
+
+    #errorLog {
+      background: #ffe8e8;
+      border-left: 5px solid #d10000;
+      color: #8a0000;
+    }
+
+    .label {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin: 3px 0;
+    }
+
+    .badge-accuracy { background: #e6ffe6; color: #006600; }
+    .badge-lat      { background: #fff4e6; color: #b35900; }
+    .badge-lng      { background: #f3e5ff; color: #5e00b3; }
+  </style>
+</head>
+<body>
+
+  <h2>Geolocation Accuracy POC</h2>
+
+  <!-- Toggle enableHighAccuracy -->
+  <label>
+    <strong>High Accuracy:</strong>
+    <input type="checkbox" id="accuracyToggle" />
+  </label>
+
+  <br><br>
+
+  <!-- Single location button -->
+  <button id="singleBtn">Get Location Once</button>
+
+  <!-- Live tracking buttons -->
+  <button id="watchBtn">Start Live Tracking</button>
+  <button id="stopWatchBtn">Stop Tracking</button>
+
+  <div id="log">Waiting for action...</div>
+  <div id="errorLog"></div>
+
+  <script>
+    const logBox = document.getElementById("log");
+    const errBox = document.getElementById("errorLog");
+    const accuracyToggle = document.getElementById("accuracyToggle");
+
+    let watchId = null;
+
+    function log(html) {
+      logBox.innerHTML = html;
+    }
+
+    function logError(html) {
+      errBox.innerHTML = html;
+    }
+
+    function getGeoOptions() {
+      return { enableHighAccuracy: accuracyToggle.checked };
+    }
+
+    function formatLocation(pos) {
+      return `
+        <div class="label badge-accuracy">Accuracy: ${pos.coords.accuracy.toFixed(2)} m</div><br>
+        <div class="label badge-lat">Lat: ${pos.coords.latitude.toFixed(6)}</div><br>
+        <div class="label badge-lng">Lng: ${pos.coords.longitude.toFixed(6)}</div>
+      `;
+    }
+
+    // 1️⃣ Get Location Once
+    document.getElementById("singleBtn").onclick = () => {
+      errBox.textContent = "";
+      log("Getting location...");
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          log(formatLocation(pos));
+        },
+        (err) => logError(`<strong>Error:</strong> ${err.message}`),
+        getGeoOptions()
+      );
+    };
+
+    // 2️⃣ Start Live Tracking
+    document.getElementById("watchBtn").onclick = () => {
+      errBox.textContent = "";
+      log("Starting live tracking...");
+
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          log(formatLocation(pos));
+        },
+        (err) => logError(`<strong>Error:</strong> ${err.message}`),
+        getGeoOptions()
+      );
+    };
+
+    // 3️⃣ Stop Live Tracking
+    document.getElementById("stopWatchBtn").onclick = () => {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        log("Tracking stopped.");
+      }
+    };
+  </script>
+
+</body>
+</html>
