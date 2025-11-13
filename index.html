@@ -5,63 +5,95 @@
   <title>Geolocation POC</title>
 
   <style>
+    /* -------------------------
+       GLOBAL LAYOUT
+    ------------------------- */
     body {
       font-family: sans-serif;
       padding: 20px;
-      max-width: 700px;
-      margin: auto;
+      margin: 0;
+      max-width: 600px;
+      caret-color: transparent;
     }
 
     h2 {
-      font-size: clamp(20px, 5vw, 28px);
+      font-size: clamp(22px, 6vw, 32px);
+      margin-bottom: 20px;
+      text-align: center;
     }
 
+    /* -------------------------
+       BUTTONS
+    ------------------------- */
     button {
-      margin-right: 10px;
-      margin-top: 10px;
-      padding: 10px 16px;
-      font-size: clamp(14px, 2.5vw, 16px);
-      border-radius: 6px;
+      width: 100%;
+      padding: 16px;
+      margin-top: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #0077ff;
+      color: white;
+      font-size: clamp(16px, 4vw, 20px);
+      font-weight: bold;
       cursor: pointer;
+      transition: 0.2s;
     }
 
-    /* Make buttons stack nicely on small screens */
-    @media (max-width: 500px) {
-      button {
-        width: 100%;
-        margin-right: 0;
-      }
+    button:hover {
+      background: #005fcc;
     }
 
+    /* -------------------------
+       HIGH ACCURACY SWITCH
+    ------------------------- */
+    label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: clamp(16px, 4vw, 20px);
+      margin-bottom: 20px;
+    }
+
+    input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* -------------------------
+       LOG BOXES
+    ------------------------- */
     #log, #errorLog {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: clamp(13px, 2.5vw, 16px);
-      min-height: 50px;
-      white-space: pre-wrap;
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 10px;
+      font-size: clamp(15px, 4vw, 18px);
+      min-height: 60px;
+      line-height: 1.5;
       word-break: break-word;
     }
 
     #log {
       background: #eef7ff;
-      border-left: 5px solid #3399ff;
+      border-left: 6px solid #3399ff;
       color: #004a80;
     }
 
     #errorLog {
       background: #ffe8e8;
-      border-left: 5px solid #d10000;
+      border-left: 6px solid #d10000;
       color: #8a0000;
     }
 
+    /* -------------------------
+       BADGES
+    ------------------------- */
     .label {
       display: inline-block;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: clamp(12px, 2.5vw, 14px);
-      margin: 4px 0;
-      word-break: break-word;
+      padding: 8px 12px;
+      margin: 5px 0;
+      border-radius: 8px;
+      font-size: clamp(14px, 3.5vw, 18px);
+      font-weight: 600;
     }
 
     .badge-accuracy { background: #e6ffe6; color: #006600; }
@@ -69,24 +101,19 @@
     .badge-lng      { background: #f3e5ff; color: #5e00b3; }
   </style>
 </head>
+
 <body>
 
   <h2>Geolocation Accuracy POC</h2>
 
-  <!-- Toggle enableHighAccuracy -->
-  <label style="font-size: clamp(14px, 3vw, 18px);">
-    <strong>High Accuracy:</strong>
+  <label>
+    <strong>High Accuracy</strong>
     <input type="checkbox" id="accuracyToggle" />
   </label>
 
-  <br><br>
-
-  <!-- Single location button -->
-  <button id="singleBtn">Get Location Once</button>
-
-  <!-- Live tracking buttons -->
-  <button id="watchBtn">Start Live Tracking</button>
-  <button id="stopWatchBtn">Stop Tracking</button>
+  <button id="singleBtn">📍 Get Location Once</button>
+  <button id="watchBtn">▶️ Start Live Tracking</button>
+  <button id="stopWatchBtn">⏹ Stop Tracking</button>
 
   <div id="log">Waiting for action...</div>
   <div id="errorLog"></div>
@@ -95,7 +122,6 @@
     const logBox = document.getElementById("log");
     const errBox = document.getElementById("errorLog");
     const accuracyToggle = document.getElementById("accuracyToggle");
-
     let watchId = null;
 
     function log(html) {
@@ -118,37 +144,32 @@
       `;
     }
 
-    // Get Location Once
+    // Single location fetch
     document.getElementById("singleBtn").onclick = () => {
       errBox.innerHTML = "";
       log("Getting location...");
 
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          log(formatLocation(pos));
-        },
+        (pos) => log(formatLocation(pos)),
         (err) => logError(`<strong>Error:</strong> ${err.message}`),
         getGeoOptions()
       );
     };
 
-    // Start Live Tracking
+    // Live tracking
     document.getElementById("watchBtn").onclick = () => {
       errBox.innerHTML = "";
       log("Starting live tracking...");
-
       if (watchId !== null) navigator.geolocation.clearWatch(watchId);
 
       watchId = navigator.geolocation.watchPosition(
-        (pos) => {
-          log(formatLocation(pos));
-        },
+        (pos) => log(formatLocation(pos)),
         (err) => logError(`<strong>Error:</strong> ${err.message}`),
         getGeoOptions()
       );
     };
 
-    // Stop Live Tracking
+    // Stop tracking
     document.getElementById("stopWatchBtn").onclick = () => {
       if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
