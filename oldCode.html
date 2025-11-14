@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Geolocation POC</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <style>
+    :root{
+      --bg: #f5f7fa;
+      --card: #fff;
+      --primary: #007bff;
+      --muted: #6b7280;
+      --radius: 14px;
+      --padding: 18px;
+      --shadow: 0 6px 24px rgba(12,34,56,0.06);
+    }
+
+    /* ---------- Reset & layout ---------- */
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background:var(--bg);
+      display:flex;
+      justify-content:center;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      color:#111827;
+    }
+    .viewport {
+      width:100%;
+      max-width:480px;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* ---------- Header (sticky) ---------- */
+    header.appbar{
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(15,23,42,0.04);
+      padding: 10px 14px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      box-shadow: 0 2px 6px rgba(12,34,56,0.03);
+    }
+
+    .app-title {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:1;
+    }
+
+    .logo {
+      width:44px;
+      height:44px;
+      border-radius:10px;
+      background:var(--primary);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-weight:700;
+      font-size:18px;
+      box-shadow: 0 6px 18px rgba(0,123,255,0.18);
+    }
+
+    .title-text {
+      font-size:18px;
+      font-weight:700;
+      line-height:1;
+    }
+
+    .subtitle {
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      font-weight:600;
+    }
+
+    .status {
+      font-size:13px;
+      color:var(--muted);
+      background: rgba(15,23,42,0.03);
+      padding:8px 10px;
+      border-radius:10px;
+      font-weight:600;
+    }
+
+    /* ---------- Content ---------- */
+    main {
+      padding: 18px;
+      flex:1;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: var(--padding);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .toggle-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .toggle-row .label {
+      font-size:16px;
+      font-weight:700;
+    }
+
+    input[type="checkbox"]{
+      width:22px;
+      height:22px;
+      accent-color: var(--primary);
+    }
+
+    /* ---------- Buttons (large, mobile friendly) ---------- */
+    .actions { display:flex; flex-direction:column; gap:12px; }
+    button {
+      width:100%;
+      padding:16px;
+      border-radius:12px;
+      border: none;
+      cursor:pointer;
+      font-size:17px;
+      font-weight:700;
+      color:white;
+      background: var(--primary);
+      box-shadow: 0 8px 20px rgba(0,123,255,0.16);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    button:active{ transform: translateY(1px); }
+    .secondary {
+      background: #10b981; /* green */
+      box-shadow: 0 8px 20px rgba(16,185,129,0.12);
+    }
+    .danger {
+      background: #ef4444;
+      box-shadow: 0 8px 20px rgba(239,68,68,0.12);
+    }
+
+    /* ---------- Log boxes ---------- */
+    #log, #errorLog {
+      border-radius: 12px;
+      padding: 14px;
+      font-size:16px;
+      line-height:1.6;
+      min-height:58px;
+      word-break:break-word;
+    }
+
+    #log {
+      background: #eaf4ff;
+      border-left:6px solid #1a89ff;
+      color:#003e7a;
+    }
+    #errorLog {
+      background:#fff0f0;
+      border-left:6px solid #ef4444;
+      color:#8a0000;
+    }
+
+    /* ---------- Badges ---------- */
+    .badge {
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:10px;
+      font-weight:700;
+      margin:6px 0;
+      font-size:15px;
+    }
+    .badge.acc { background:#e8ffec; color:#047857; }
+    .badge.lat { background:#fff7ed; color:#9a3412; }
+    .badge.lng { background:#f5f3ff; color:#5b21b6; }
+
+    /* ---------- Footer spacing ---------- */
+    footer { height:18px; }
+
+    /* ---------- Responsive tweaks ---------- */
+    @media (min-width: 600px){
+      .viewport { max-width: 680px; }
+      .logo { width:48px; height:48px; font-size:20px; border-radius:12px; }
+      .title-text { font-size:20px; }
+      button { font-size:16px; padding:14px; }
+      .badge { font-size:15px; padding:8px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="viewport">
+
+    <!-- Header -->
+    <header class="appbar">
+      <div class="app-title">
+        <div class="logo">G</div>
+        <div>
+          <div class="title-text">Geo POC</div>
+          <div class="subtitle">Accuracy & Live Tracking</div>
+        </div>
+      </div>
+
+      <!-- small status area; untouched by JS but nice UX -->
+      <div id="netStatus" class="status">Ready</div>
+    </header>
+
+    <!-- Main content -->
+    <main>
+      <div class="card">
+        <div class="toggle-row">
+          <div class="label">High Accuracy</div>
+          <input type="checkbox" id="accuracyToggle" aria-label="Enable High Accuracy" />
+        </div>
+      </div>
+
+      <div class="card actions">
+        <button id="singleBtn">📍 Get Location Once</button>
+        <button id="watchBtn" class="secondary">▶️ Start Live Tracking</button>
+        <button id="stopWatchBtn" class="danger">⏹ Stop Tracking</button>
+      </div>
+
+      <div id="log" class="card">Waiting for action...</div>
+      <div id="errorLog" class="card" aria-live="polite"></div>
+    </main>
+
+    <footer></footer>
+  </div>
+
+  <script>
+    // === existing functionality kept intact ===
+    const logBox = document.getElementById("log");
+    const errBox = document.getElementById("errorLog");
+    const accuracyToggle = document.getElementById("accuracyToggle");
+    const netStatus = document.getElementById("netStatus");
+    let watchId = null;
+
+    // small optional status update (non-functional for geolocation)
+    function setStatus(text){
+      if(netStatus) netStatus.textContent = text;
+    }
+
+    function log(html){
+      logBox.innerHTML = html;
+      setStatus('Last update: ' + new Date().toLocaleTimeString());
+    }
+    function logError(html){
+      errBox.innerHTML = html;
+      setStatus('Error');
+    }
+
+    function getGeoOptions(){ return { enableHighAccuracy: accuracyToggle.checked }; }
+
+    function formatLocation(pos){
+      return `
+        <div class="badge acc">Accuracy: ${pos.coords.accuracy.toFixed(2)} m</div><br>
+        <div class="badge lat">Lat: ${pos.coords.latitude.toFixed(6)}</div><br>
+        <div class="badge lng">Lng: ${pos.coords.longitude.toFixed(6)}</div>
+      `;
+    }
+
+    document.getElementById("singleBtn").onclick = () => {
+      errBox.innerHTML = "";
+      log('Getting location...');
+      navigator.geolocation.getCurrentPosition(
+        (pos) => log(formatLocation(pos)),
+        (err) => logError(`<strong>Error:</strong> ${err.message}`),
+        getGeoOptions()
+      );
+    };
+
+    document.getElementById("watchBtn").onclick = () => {
+      errBox.innerHTML = "";
+      log('Starting live tracking...');
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => log(formatLocation(pos)),
+        (err) => logError(`<strong>Error:</strong> ${err.message}`),
+        getGeoOptions()
+      );
+    };
+
+    document.getElementById("stopWatchBtn").onclick = () => {
+      if (watchId !== null){
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        log('Tracking stopped.');
+      }
+    };
+
+    // optional: update network status (visual nicety)
+    window.addEventListener('online', () => setStatus('Online'));
+    window.addEventListener('offline', () => setStatus('Offline'));
+  </script>
+</body>
+</html>
