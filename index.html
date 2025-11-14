@@ -240,69 +240,143 @@
   </div>
 
   <script>
-    // === existing functionality kept intact ===
-    const logBox = document.getElementById("log");
-    const errBox = document.getElementById("errorLog");
-    const accuracyToggle = document.getElementById("accuracyToggle");
-    const netStatus = document.getElementById("netStatus");
-    let watchId = null;
-
-    // small optional status update (non-functional for geolocation)
-    function setStatus(text){
-      if(netStatus) netStatus.textContent = text;
+/* ============================================================
+   YOUR FUNCTION (UNTOUCHED — COPY-PASTE EXACTLY AS GIVEN)
+   ============================================================ */
+function requestGeoLocation() {
+  return new Promise((resolve) => {
+    if (!navigator?.geolocation) {
+      return resolve({
+        success: false,
+        status: 'ERROR',
+        message: 'Geolocation API not supported',
+      });
     }
 
-    function log(html){
-      logBox.innerHTML = html;
-      setStatus('Last update: ' + new Date().toLocaleTimeString());
-    }
-    function logError(html){
-      errBox.innerHTML = html;
-      setStatus('Error');
-    }
-
-    function getGeoOptions(){ return { enableHighAccuracy: accuracyToggle.checked }; }
-
-    function formatLocation(pos){
-      return `
-        <div class="badge acc">Accuracy: ${pos.coords.accuracy.toFixed(2)} m</div><br>
-        <div class="badge lat">Lat: ${pos.coords.latitude.toFixed(6)}</div><br>
-        <div class="badge lng">Lng: ${pos.coords.longitude.toFixed(6)}</div>
-      `;
-    }
-
-    document.getElementById("singleBtn").onclick = () => {
-      errBox.innerHTML = "";
-      log('Getting location...');
-      navigator.geolocation.getCurrentPosition(
-        (pos) => log(formatLocation(pos)),
-        (err) => logError(`<strong>Error:</strong> ${err.message}`),
-        getGeoOptions()
-      );
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
     };
 
-    document.getElementById("watchBtn").onclick = () => {
-      errBox.innerHTML = "";
-      log('Starting live tracking...');
-      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-      watchId = navigator.geolocation.watchPosition(
-        (pos) => log(formatLocation(pos)),
-        (err) => logError(`<strong>Error:</strong> ${err.message}`),
-        getGeoOptions()
-      );
-    };
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const {latitude, longitude, accuracy} = pos.coords;
 
-    document.getElementById("stopWatchBtn").onclick = () => {
-      if (watchId !== null){
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-        log('Tracking stopped.');
-      }
-    };
+        resolve({
+          success: true,
+          status: 'SUCCESS',
+          location: {
+            latitude: `${latitude}`,
+            longitude: `${longitude}`,
+            accuracy: `${accuracy}`,
+          },
+        });
+      },
 
-    // optional: update network status (visual nicety)
-    window.addEventListener('online', () => setStatus('Online'));
-    window.addEventListener('offline', () => setStatus('Offline'));
-  </script>
+      (err) => {
+        const statusMap = {
+          [err.PERMISSION_DENIED]: 'DENIED',
+          [err.POSITION_UNAVAILABLE]: 'UNAVAILABLE',
+          [err.TIMEOUT]: 'TIMEOUT',
+        };
+
+        resolve({
+          success: false,
+          status: statusMap[err.code] ?? 'ERROR',
+          message: err.message,
+        });
+      },
+
+      options,
+    );
+  });
+}
+
+/* ============================================================
+   UI HOOKS + HANDLERS
+   ============================================================ */
+const logBox = document.getElementById("log");
+const errBox = document.getElementById("errorLog");
+const netStatus = document.getElementById("netStatus");
+
+function setStatus(text){
+  netStatus.textContent = text;
+}
+
+function showSuccess(res) {
+  const { latitude, longitude, accuracy } = res.location;
+
+  logBox.innerHTML = `
+    <div class="badge acc">Accuracy: ${accuracy} m</div><br>
+    <div class="badge lat">Lat: ${latitude}</div><br>
+    <div class="badge lng">Lng: ${longitude}</div>
+  `;
+  errBox.innerHTML = "";
+  setStatus("SUCCESS");
+}
+
+function showError(res) {
+  logBox.innerHTML = "";
+  errBox.innerHTML = `
+    <strong>${res.status}</strong><br>
+    ${res.message ?? ''}
+  `;
+  setStatus("ERROR");
+}
+
+/* ============================================================
+   BUTTON: GET LOCATION ONCE
+   ============================================================ */
+document.getElementById("singleBtn").onclick = async () => {
+  logBox.innerHTML = "Requesting location...";
+  errBox.innerHTML = "";
+  setStatus("Requesting...");
+
+  const res = await requestGeoLocation();
+
+  if (res.success) showSuccess(res);
+  else showError(res);
+};
+
+/* ============================================================
+   BUTTON: START LIVE TRACKING (POLLING USING YOUR FUNCTION)
+   ============================================================ */
+let trackingInterval = null;
+
+document.getElementById("watchBtn").onclick = () => {
+  errBox.innerHTML = "";
+  logBox.innerHTML = "Starting live tracking...";
+  setStatus("Tracking...");
+
+  if (trackingInterval) clearInterval(trackingInterval);
+
+  trackingInterval = setInterval(async () => {
+    const res = await requestGeoLocation();
+    if (res.success) showSuccess(res);
+    else showError(res);
+  }, 2000); // poll every 2 sec (no change in your function)
+};
+
+/* ============================================================
+   BUTTON: STOP TRACKING
+   ============================================================ */
+document.getElementById("stopWatchBtn").onclick = () => {
+  if (trackingInterval) {
+    clearInterval(trackingInterval);
+    trackingInterval = null;
+  }
+  logBox.innerHTML = "Tracking stopped.";
+  errBox.innerHTML = "";
+  setStatus("Stopped");
+};
+
+/* SMALL NETWORK STATUS */
+window.addEventListener('online', () => setStatus('Online'));
+window.addEventListener('offline', () => setStatus('Offline'));
+
+</script>
+
 </body>
 </html>
+
