@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Intl.Notation Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f7f7f7;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 30px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    input {
+      padding: 10px 12px;
+      width: 280px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-align: center;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #007bff;
+    }
+
+    .output {
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+      min-height: 28px; /* keeps space even when empty */
+      text-align: center;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Intl Number Notation Demo</h2>
+
+  <input id="numInput" placeholder="Enter a number... (try large ones!)" />
+
+  <div class="output" id="formattedOutput"></div>
+</div>
+
+<script>
+  const threshold = 10000;
+
+  const formatNumber = (value) => {
+    let num = Number(value);
+
+    if (isNaN(num)) return "Invalid number";
+
+    if (num < threshold) return value;
+
+    return new Intl.NumberFormat("en-US", {
+      notation: "compact",
+      compactDisplay: "short",
+      maximumFractionDigits: 2
+    }).format(num);
+  };
+
+  document.getElementById("numInput").addEventListener("input", (e) => {
+    const value = e.target.value.trim();
+    const output = formatNumber(value);
+    document.getElementById("formattedOutput").textContent = output;
+  });
+</script>
+
+</body>
+</html>
