@@ -23,19 +23,20 @@
       background: white;
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 350px;
     }
 
-    input {
-      padding: 10px 12px;
-      width: 280px;
+    select, input {
+      padding: 10px;
+      width: 100%;
       font-size: 16px;
-      border: 1px solid #ccc;
       border-radius: 6px;
-      text-align: center;
+      border: 1px solid #ccc;
       outline: none;
+      text-align: center;
     }
 
-    input:focus {
+    select:focus, input:focus {
       border-color: #007bff;
     }
 
@@ -43,7 +44,7 @@
       font-size: 22px;
       font-weight: bold;
       color: #333;
-      min-height: 28px; /* keeps space even when empty */
+      min-height: 28px;
       text-align: center;
     }
 
@@ -59,36 +60,77 @@
 <div class="container">
   <h2>Number Notation Demo</h2>
 
+  <!-- Currency Locale Select -->
+  <select id="localeSelect"></select>
+
+  <!-- Number Input -->
   <input id="numInput" placeholder="Enter a number..." />
 
+  <!-- Output -->
   <div class="output" id="formattedOutput"></div>
 </div>
 
 <script>
+  // Currency → Locale map
+  const CURRENCY_LOCAL = {
+    INR: 'en-IN',
+    USD: 'en-US',
+    CAD: 'en-CA',
+    AUD: 'en-AU',
+    EUR: 'en-IE',
+    GBP: 'en-GB',
+    JPY: 'ja-JP',
+    NZD: 'en-NZ',
+    HKD: 'zh-HK',
+    SGD: 'zh-SG',
+    DKK: 'da-DK',
+  };
+
   const threshold = 10000;
 
-  const formatNumber = (value) => {
-    let num = Number(value);
+  const localeSelect = document.getElementById("localeSelect");
+  const numInput = document.getElementById("numInput");
+  const outputDiv = document.getElementById("formattedOutput");
 
-    if (isNaN(num))  {
-        alert("Invalid number");
-        return;
-    };
+  // Populate select with currency + locale
+  for (const currency in CURRENCY_LOCAL) {
+    const locale = CURRENCY_LOCAL[currency];
+    const option = document.createElement("option");
+    option.value = locale; // locale is the value
+    option.textContent = `${currency} (${locale})`; // label
+    localeSelect.appendChild(option);
+  }
 
-    // if (num < threshold) return value;
+  // Default to INR
+  localeSelect.value = CURRENCY_LOCAL.INR;
 
-    return new Intl.NumberFormat("en-US", {
+  // Formatting logic
+  const formatNumber = (value, locale) => {
+    const num = Number(value);
+    if (isNaN(num)) return "Invalid number";
+
+    // No notation if below threshold
+    if (num < threshold) return value;
+
+    // Compact notation formatting
+    return new Intl.NumberFormat(locale, {
       notation: "compact",
       compactDisplay: "short",
       maximumFractionDigits: 2
     }).format(num);
   };
 
-  document.getElementById("numInput").addEventListener("input", (e) => {
-    const value = e.target.value.trim();
-    const output = formatNumber(value);
-    document.getElementById("formattedOutput").textContent = output;
-  });
+  // Update on input
+  const updateOutput = () => {
+    const value = numInput.value.trim();
+    const locale = localeSelect.value;
+
+    const formatted = formatNumber(value, locale);
+    outputDiv.textContent = formatted;
+  };
+
+  numInput.addEventListener("input", updateOutput);
+  localeSelect.addEventListener("change", updateOutput);
 </script>
 
 </body>
