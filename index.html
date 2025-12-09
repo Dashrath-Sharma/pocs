@@ -18,54 +18,60 @@
     }
 
     .container {
-      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      max-width: 90%;
     }
 
-    .link-box {
-      display: block;
-      margin: 12px 0;
-      padding: 14px 22px;
+    .link-chip {
+      padding: 0.5rem 0.8rem;
       border: 2px solid #4a90e2;
-      border-radius: 10px;
+      border-radius: 8px;
       text-decoration: none;
-      font-size: 18px;
+      font-size: 16px;
       color: #4a90e2;
-      transition: 0.3s ease;
-      width: 260px;
-      margin-left: auto;
-      margin-right: auto;
+      transition: 0.25s ease;
+      white-space: nowrap;
     }
 
-    .link-box:hover {
+    .link-chip:hover {
       background: #4a90e2;
       color: #fff;
     }
 
     h1 {
-      margin-bottom: 20px;
+      position: absolute;
+      top: 40px;
+      width: 100%;
+      text-align: center;
       color: #333;
+      font-size: 24px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>POCs</h1>
+  <h1>POCs</h1>
 
-    <a class="link-box" href="./geo-location-iframe/">
+  <div class="container">
+
+    <a class="link-chip" href="./geo-location-iframe/">
       Geo Location Iframe
     </a>
 
-    <a class="link-box" href="./number-formatter/">
+    <a class="link-chip" href="./number-formatter/">
       Number Formatter
     </a>
 
-    <!-- Add more POCs like this -->
+    <!-- Add more chips like this -->
     <!--
-    <a class="link-box" href="./folder-name/">
+    <a class="link-chip" href="./folder-name/">
       Folder Name
     </a>
     -->
+
   </div>
 
 </body>
