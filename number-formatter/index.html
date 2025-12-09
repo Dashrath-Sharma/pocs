@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Intl.Notation Demo</title>
+  <title>Number Notation Demo</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -57,9 +57,9 @@
 <body>
 
 <div class="container">
-  <h2>Intl Number Notation Demo</h2>
+  <h2>Number Notation Demo</h2>
 
-  <input id="numInput" placeholder="Enter a number... (try large ones!)" />
+  <input id="numInput" placeholder="Enter a number..." />
 
   <div class="output" id="formattedOutput"></div>
 </div>
@@ -70,9 +70,12 @@
   const formatNumber = (value) => {
     let num = Number(value);
 
-    if (isNaN(num)) return "Invalid number";
+    if (isNaN(num))  {
+        alert("Invalid number");
+        return;
+    };
 
-    if (num < threshold) return value;
+    // if (num < threshold) return value;
 
     return new Intl.NumberFormat("en-US", {
       notation: "compact",
