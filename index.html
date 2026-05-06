@@ -4,73 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>POCs Home</title>
-
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-    }
-
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      justify-content: center;
-      max-width: 90%;
-    }
-
-    .link-chip {
-      padding: 0.5rem 0.8rem;
-      border: 2px solid #4a90e2;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 16px;
-      color: #4a90e2;
-      transition: 0.25s ease;
-      white-space: nowrap;
-    }
-
-    .link-chip:hover {
-      background: #4a90e2;
-      color: #fff;
-    }
-
-    h1 {
-      position: absolute;
-      top: 40px;
-      width: 100%;
-      text-align: center;
-      color: #333;
-      font-size: 24px;
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <link rel="stylesheet" type="text/css" href="./style.css" />
 </head>
 <body>
 
-  <h1>POCs</h1>
+  <div class="header">
+    <div class="badge">
+      <i class="ti ti-flask"></i>
+      Proof of Concepts
+    </div>
+    <div class="badge">
+      By Dashrath Sharma
+    </div>
+    <h1 class="title">My <span>POCs</span></h1>
+    <p class="subtitle">A collection of small experiments and utilities</p>
+  </div>
 
-  <div class="container">
+  <div class="grid" id="grid">
 
     <a class="link-chip" href="./geo-location-iframe/">
-      Geo Location Iframe
+      <div class="chip-icon"><i class="ti ti-map-pin"></i></div>
+      <span class="chip-label">Geo Location Iframe</span>
+      <i class="ti ti-arrow-right chip-arrow"></i>
     </a>
 
     <a class="link-chip" href="./number-formatter/">
-      Number Formatter
+      <div class="chip-icon"><i class="ti ti-123"></i></div>
+      <span class="chip-label">Number Formatter</span>
+      <i class="ti ti-arrow-right chip-arrow"></i>
     </a>
 
-    <!-- Add more chips like this -->
-    <!--
-    <a class="link-chip" href="./folder-name/">
-      Folder Name
+    <a class="link-chip" href="./mongo-compatible-string/">
+      <div class="chip-icon"><i class="ti ti-braces"></i></div>
+      <span class="chip-label">JSON String Converter</span>
+      <i class="ti ti-arrow-right chip-arrow"></i>
     </a>
-    -->
 
   </div>
 

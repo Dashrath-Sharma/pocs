@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSON String Converter</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <link rel="stylesheet" type="text/css" href="./style.css" />
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="badge">
+      <i class="ti ti-braces"></i>
+      By Dashrath Sharma
+    </div>
+    <h1 class="title">JSON String Converter</h1>
+    <p class="subtitle">Convert raw text into a MongoDB-compatible escaped string.</p>
+  </div>
+
+  <!-- Input card -->
+  <div class="card">
+    <p class="label"><i class="ti ti-pencil"></i> Input</p>
+    <textarea id="input" placeholder='Paste or type your text here...&#10;&#10;Newlines → \n&#10;Smart quotes → \"'></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="convert()">
+        <i class="ti ti-transform"></i> Convert
+      </button>
+      <button class="btn btn-ghost" onclick="clearAll()">
+        <i class="ti ti-refresh"></i> Clear
+      </button>
+    </div>
+  </div>
+
+  <!-- Output card -->
+  <div class="card">
+    <p class="label"><i class="ti ti-code"></i> Output</p>
+    <div class="output-wrapper">
+      <div class="output-box" id="output">
+        <span class="output-placeholder">Your converted string will appear here...</span>
+      </div>
+      <button class="copy-btn" onclick="copyOutput()" title="Copy to clipboard" aria-label="Copy output">
+        <i class="ti ti-copy" id="copy-icon"></i>
+      </button>
+    </div>
+    <div class="stats-row" id="stats" style="display:none">
+      <div class="stat"><i class="ti ti-letter-case" style="font-size:13px"></i> Length: <span id="stat-len">0</span> chars</div>
+      <div class="stat"><i class="ti ti-replace" style="font-size:13px"></i> Replacements: <span id="stat-rep">0</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">
+  <i class="ti ti-check" id="toast-icon"></i>
+  <span id="toast-msg">Done!</span>
+</div>
+
+<script src="./script.js"></script>
+
+</body>
+</html>

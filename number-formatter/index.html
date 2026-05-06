@@ -2,136 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Number Notation Demo</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #f7f7f7;
-    }
-
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-      padding: 30px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      width: 350px;
-    }
-
-    select, input {
-      padding: 10px;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      outline: none;
-      text-align: center;
-    }
-
-    select:focus, input:focus {
-      border-color: #007bff;
-    }
-
-    .output {
-      font-size: 22px;
-      font-weight: bold;
-      color: #333;
-      min-height: 28px;
-      text-align: center;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 10px;
-      color: #444;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Number Formatter</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <link rel="stylesheet" type="text/css" href="./style.css" />
 </head>
 <body>
 
 <div class="container">
-  <h2>Number Notation Demo</h2>
 
-  <!-- Currency Locale Select -->
-  <select id="localeSelect"></select>
+  <div class="header">
+    <div class="badge"><i class="ti ti-123"></i> Utility by Dashrath Sharma</div>
+    <h1 class="title">Number Formatter</h1>
+    <p class="subtitle">Compact notation across currencies &amp; locales</p>
+  </div>
 
-  <!-- Number Input -->
-  <input id="numInput" placeholder="Enter a number..." />
+  <div class="card">
 
-  <!-- Output -->
-  <div class="output" id="formattedOutput"></div>
+    <!-- Quick currency pills -->
+    <div class="field">
+      <p class="label"><i class="ti ti-coins"></i> Quick select</p>
+      <div class="currency-pills" id="pills"></div>
+    </div>
+
+    <!-- Locale dropdown -->
+    <div class="field">
+      <p class="label"><i class="ti ti-world"></i> Currency / Locale</p>
+      <div class="select-wrapper">
+        <select id="localeSelect"></select>
+        <i class="ti ti-chevron-down"></i>
+      </div>
+    </div>
+
+    <!-- Number input -->
+    <div class="field">
+      <p class="label"><i class="ti ti-keyboard"></i> Number</p>
+      <div class="input-wrapper">
+        <i class="ti ti-hash"></i>
+        <input id="numInput" type="number" placeholder="Enter a number..." />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Output -->
+    <div class="output-section">
+      <p class="output-label">Formatted output</p>
+      <div class="output-value empty" id="formattedOutput">—</div>
+      <div class="output-raw" id="rawOutput"></div>
+    </div>
+
+  </div>
+
 </div>
 
-<script>
-  // Currency → Locale map
-  const CURRENCY_LOCAL = {
-    INR: 'en-IN',
-    USD: 'en-US',
-    CAD: 'en-CA',
-    AUD: 'en-AU',
-    EUR: 'en-IE',
-    GBP: 'en-GB',
-    JPY: 'ja-JP',
-    NZD: 'en-NZ',
-    HKD: 'zh-HK',
-    SGD: 'zh-SG',
-    DKK: 'da-DK',
-  };
-
-  const threshold = 10000;
-
-  const localeSelect = document.getElementById("localeSelect");
-  const numInput = document.getElementById("numInput");
-  const outputDiv = document.getElementById("formattedOutput");
-
-  // Populate select with currency + locale
-  for (const currency in CURRENCY_LOCAL) {
-    const locale = CURRENCY_LOCAL[currency];
-    const option = document.createElement("option");
-    option.value = locale; // locale is the value
-    option.textContent = `${currency} (${locale})`; // label
-    localeSelect.appendChild(option);
-  }
-
-  // Default to INR
-  localeSelect.value = CURRENCY_LOCAL.INR;
-
-  // Formatting logic
-  const formatNumber = (value, locale) => {
-    const num = Number(value);
-    if (isNaN(num)) return "Invalid number";
-
-    // No notation if below threshold
-    // if (num < threshold) return value;
-
-    // Compact notation formatting
-    return new Intl.NumberFormat(locale, {
-      notation: "compact",
-      compactDisplay: "short",
-      maximumFractionDigits: 2
-    }).format(num);
-  };
-
-  // Update on input
-  const updateOutput = () => {
-    const value = numInput.value.trim();
-    const locale = localeSelect.value;
-
-    const formatted = formatNumber(value, locale);
-    outputDiv.textContent = formatted;
-  };
-
-  numInput.addEventListener("input", updateOutput);
-  localeSelect.addEventListener("change", updateOutput);
-</script>
-
+<script src="./script.js"></script>
 </body>
 </html>
